@@ -5,17 +5,38 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/spf13/viper"
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 )
 
 func GetPrompt() string {
-	prompt := `Given the following information, provide an explanation for what happened
-and offer solutions.`
+	prompt := `Given the following system information and command input + output, 
+dignose the problem and provide a solution. Do not repeat the system info.`
+
+	verbosity := viper.Get("VERBOSITY")
+
+	if verbosity == 0 {
+		prompt += "\nBe as succinct as possible."
+	}
+	if verbosity == 2 {
+		prompt += "\nBe as detailed as possible."
+	}
+
 	return prompt
 }
 
-func CallLLM(message string, model string) string {
+func getModel() string {
+	if str, ok := viper.Get("MODEL").(string); ok {
+		return str
+	} else {
+		log.Fatalf("Invalid model selected.")
+		return ""
+	}
+}
+
+func CallLLM(message string) string {
+	model := getModel()
 	llm, err := ollama.New(ollama.WithModel(model))
 	if err != nil {
 		log.Fatal(err)

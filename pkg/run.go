@@ -2,9 +2,10 @@ package pkg
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
 	"os/exec"
 	"strings"
+
+	"github.com/manifoldco/promptui"
 )
 
 func Rerun(command string) string {
@@ -41,7 +42,7 @@ func Ask(command string) string {
 
 	fmt.Println(out)
 
-	completion := CallLLM(GetPrompt()+out, "llama3.2:1b")
+	completion := CallLLM(GetPrompt() + out)
 
 	return completion
 }

@@ -1,7 +1,3 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
@@ -11,6 +7,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+type Config struct {
+	Model     string `yaml:"model"`
+	Verbosity int    `yaml:"verbosity"`
+}
 
 var cfgFile string
 
@@ -59,6 +60,10 @@ func initConfig() {
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".dammit")
 	}
+
+	viper.SetDefault("VERBOSITY", 1)
+	viper.SetDefault("MODEL", "llama3.2:1b")
+	viper.SetEnvPrefix("DAMMIT")
 
 	viper.AutomaticEnv() // read in environment variables that match
 
