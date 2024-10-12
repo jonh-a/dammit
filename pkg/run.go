@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"os/exec"
+	"strings"
 )
 
 func Rerun(command string) string {
@@ -27,9 +28,20 @@ func Ask(command string) string {
 		IsConfirm: true,
 	}
 
+	systemData := GetSystemData()
+	dataString := fmt.Sprintf("Running %s", systemData.OS)
+
 	rerun, _ := prompt.Run()
 
-	fmt.Println(rerun)
+	out := dataString + "\nCommand: " + command
 
-	return ""
+	if strings.ToLower(rerun) == "y" {
+		out += "\n" + Rerun(command)
+	}
+
+	fmt.Println(out)
+
+	completion := CallLLM(GetPrompt()+out, "llama3.2:1b")
+
+	return completion
 }

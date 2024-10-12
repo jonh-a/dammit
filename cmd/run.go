@@ -14,13 +14,12 @@ import (
 // runCmd represents the run command
 var runCmd = &cobra.Command{
 	Use:   "run",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Analyze the output of a given command",
+	Long: `Analyze the output of a given command. To retrieve the output,
+you will be prompted to re-run the command.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Example:
+go_dammit run "git push"`,
 	Run: func(cmd *cobra.Command, args []string) {
 		out := pkg.Ask(args[0])
 		fmt.Println(out)
