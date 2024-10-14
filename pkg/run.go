@@ -8,19 +8,6 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-func rerunCommand(command string) string {
-	shell := GetShell()
-
-	cmd := exec.Command(shell, "-c", command)
-	output, err := cmd.CombinedOutput()
-
-	if err != nil {
-		return fmt.Sprintf("Error: %s\nOutput: %s", err.Error(), string(output))
-	}
-
-	return string(output)
-}
-
 func Run(command string) string {
 	label := fmt.Sprintf("Rerun %s", command)
 
@@ -45,4 +32,17 @@ func Run(command string) string {
 	completion := CallLLM(GetPrompt() + out)
 
 	return completion
+}
+
+func rerunCommand(command string) string {
+	shell := GetShell()
+
+	cmd := exec.Command(shell, "-c", command)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		return fmt.Sprintf("Error: %s\nOutput: %s", err.Error(), string(output))
+	}
+
+	return string(output)
 }

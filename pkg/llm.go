@@ -26,15 +26,6 @@ dignose the problem and provide a solution. Do not repeat the system info.`
 	return prompt
 }
 
-func getModel() string {
-	if str, ok := viper.Get("MODEL").(string); ok {
-		return str
-	} else {
-		log.Fatalf("Invalid model selected.")
-		return ""
-	}
-}
-
 func CallLLM(message string) string {
 	model := getModel()
 	llm, err := ollama.New(ollama.WithModel(model))
@@ -51,9 +42,17 @@ func CallLLM(message string) string {
 	)
 
 	if err != nil {
-		fmt.Println("An error occurred while calling the LLM.")
-		log.Fatal(err)
+		log.Fatalf("An error occurred while calling the LLM: %s", err)
 	}
 
 	return completion
+}
+
+func getModel() string {
+	if str, ok := viper.Get("MODEL").(string); ok {
+		return str
+	} else {
+		log.Fatalf("Invalid model selected.")
+		return ""
+	}
 }

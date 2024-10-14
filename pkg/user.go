@@ -57,7 +57,11 @@ func normalizeOSName(OS string) string {
 		return distro
 	}
 	if OS == "windows" {
-		return "windows"
+		version, err := getWindowsVersion()
+		if err != nil {
+			return "windows"
+		}
+		return version
 	}
 	return OS
 }

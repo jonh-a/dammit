@@ -9,6 +9,16 @@ import (
 	"strings"
 )
 
+func Init() {
+	shell := normalizeShellName(GetShell())
+	rc, err := determineShellRc(shell)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	appendAliasToRc(shell, rc)
+}
+
 func normalizeShellName(shell string) string {
 	if strings.Contains(shell, "zsh") {
 		return "zsh"
@@ -31,23 +41,6 @@ func determineShellRc(shell string) (string, error) {
 	default:
 		return "", errors.New("Unable to determine shell rc file")
 	}
-}
-
-func aliasSuccess(rc string) {
-	fmt.Printf(`Alias successfully added to %s! 
-	
-Run "source %s" to apply the new alias or open a new terminal.
-
-After doing so, you can run "dammit" from your terminal to troubleshoot
-your most recent command. Note:
-* The alias expects that "go_dammit" can be found in your path.
-* Dammit expects that Ollama is currrently running on your system.
-
-Dammit will use the "llama3.2:1b" model by default. You can configure the model and
-output verbosity by setting the following environment variables:
-* "DAMMIT_MODEL": The name of the Ollama model to use
-* "DAMMIT_VERBOSITY": An integer between 0 and 2
-`, rc, rc)
 }
 
 func appendAliasToRc(shell string, rc string) {
@@ -73,16 +66,23 @@ func appendAliasToRc(shell string, rc string) {
 			log.Fatalf("Error occurred when writing to %s: %s", rc, err)
 		}
 
-		aliasSuccess(rc)
+		printSuccessInstructions(rc)
 	}
 }
 
-func Init() {
-	shell := normalizeShellName(GetShell())
-	rc, err := determineShellRc(shell)
-	if err != nil {
-		log.Fatal(err)
-	}
+func printSuccessInstructions(rc string) {
+	fmt.Printf(`Alias successfully added to %s! 
+	
+Run "source %s" to apply the new alias or open a new terminal.
 
-	appendAliasToRc(shell, rc)
+After doing so, you can run "dammit" from your terminal to troubleshoot
+your most recent command. Note:
+* The alias expects that "go_dammit" can be found in your path.
+* Dammit expects that Ollama is currrently running on your system.
+
+Dammit will use the "llama3.2:1b" model by default. You can configure the model and
+output verbosity by setting the following environment variables:
+* "DAMMIT_MODEL": The name of the Ollama model to use
+* "DAMMIT_VERBOSITY": An integer between 0 and 2
+`, rc, rc)
 }
