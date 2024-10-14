@@ -33,6 +33,23 @@ func determineShellRc(shell string) (string, error) {
 	}
 }
 
+func aliasSuccess(rc string) {
+	fmt.Printf(`Alias successfully added to %s! 
+	
+Run "source %s" to apply the new alias or open a new terminal.
+
+After doing so, you can run "dammit" from your terminal to troubleshoot
+your most recent command. Note:
+* The alias expects that "go_dammit" can be found in your path.
+* Dammit expects that Ollama is currrently running on your system.
+
+Dammit will use the "llama3.2:1b" model by default. You can configure the model and
+output verbosity by setting the following environment variables:
+* "DAMMIT_MODEL": The name of the Ollama model to use
+* "DAMMIT_VERBOSITY": An integer between 0 and 2
+`, rc, rc)
+}
+
 func appendAliasToRc(shell string, rc string) {
 	if shell == "bash" || shell == "zsh" {
 		fmt.Println("Adding shell alias...")
@@ -55,6 +72,8 @@ func appendAliasToRc(shell string, rc string) {
 		if err != nil {
 			log.Fatalf("Error occurred when writing to %s: %s", rc, err)
 		}
+
+		aliasSuccess(rc)
 	}
 }
 
