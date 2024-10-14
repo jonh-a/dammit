@@ -8,7 +8,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-func Rerun(command string) string {
+func rerunCommand(command string) string {
 	shell := GetShell()
 
 	cmd := exec.Command(shell, "-c", command)
@@ -21,8 +21,8 @@ func Rerun(command string) string {
 	return string(output)
 }
 
-func Ask(command string) string {
-	label := fmt.Sprintf("Rerun %s?", command)
+func Run(command string) string {
+	label := fmt.Sprintf("Rerun %s", command)
 
 	prompt := promptui.Prompt{
 		Label:     label,
@@ -32,12 +32,12 @@ func Ask(command string) string {
 	systemData := GetSystemData()
 	dataString := fmt.Sprintf("Running %s", systemData.OS)
 
-	rerun, _ := prompt.Run()
+	shouldRerun, _ := prompt.Run()
 
 	out := dataString + "\nCommand: " + command
 
-	if strings.ToLower(rerun) == "y" {
-		out += "\n" + Rerun(command)
+	if strings.ToLower(shouldRerun) == "y" {
+		out += "\n" + rerunCommand(command)
 	}
 
 	fmt.Println(out)

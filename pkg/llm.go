@@ -51,6 +51,7 @@ func CallLLM(message string) string {
 	)
 
 	if err != nil {
+		fmt.Println("An error occurred while calling the LLM.")
 		log.Fatal(err)
 	}
 

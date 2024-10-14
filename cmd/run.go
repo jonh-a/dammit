@@ -16,7 +16,7 @@ you will be prompted to re-run the command.
 Example:
 go_dammit run "git push"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		pkg.Ask(args[0])
+		pkg.Run(args[0])
 	},
 }
 
