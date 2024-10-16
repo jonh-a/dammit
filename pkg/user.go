@@ -1,19 +1,45 @@
 package pkg
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
 )
 
 type SystemData struct {
-	OS   string
-	Arch string
+	Arch       string
+	OS         string
+	Shell      string
+	WorkingDir string
 }
 
 func GetShell() string {
 	shell := os.Getenv("SHELL")
 	return shell
+}
+
+func GetSystemData() *SystemData {
+	data := SystemData{
+		Arch:       runtime.GOARCH,
+		OS:         normalizeOSName(runtime.GOOS),
+		Shell:      GetShell(),
+		WorkingDir: getWorkingDir(),
+	}
+	return &data
+}
+
+func ParseSystemData(sd *SystemData) string {
+	return fmt.Sprintf("Arch: %s, OS: %s, Shell: %s, WorkingDir: %s",
+		sd.Arch, sd.OS, sd.Shell, sd.WorkingDir)
+}
+
+func getWorkingDir() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+	return dir
 }
 
 func getLinuxDistro() (string, error) {
@@ -59,14 +85,9 @@ func normalizeOSName(OS string) string {
 	if OS == "windows" {
 		version, err := getWindowsVersion()
 		if err != nil {
-			return "windows"
+			return "Windows"
 		}
 		return version
 	}
 	return OS
-}
-
-func GetSystemData() *SystemData {
-	data := SystemData{OS: normalizeOSName(runtime.GOOS), Arch: runtime.GOARCH}
-	return &data
 }

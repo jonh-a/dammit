@@ -14,15 +14,15 @@ func Run(command string) {
 	// and the completion will have to be generated only by the command.
 	label := fmt.Sprintf("Rerun %s", command)
 
-	prompt := promptui.Prompt{
+	rerunPrompt := promptui.Prompt{
 		Label:     label,
 		IsConfirm: true,
 	}
 
-	systemData := GetSystemData()
-	dataString := fmt.Sprintf("Running %s", systemData.OS)
+	sd := GetSystemData()
+	dataString := ParseSystemData(sd)
 
-	shouldRerun, _ := prompt.Run()
+	shouldRerun, _ := rerunPrompt.Run()
 
 	out := dataString + "\nCommand: " + command
 
@@ -44,12 +44,12 @@ func Run(command string) {
 	// Ask the user to run the suggested command, if one is available.
 	label = fmt.Sprintf("Run %s", recommendedCommand)
 
-	prompt = promptui.Prompt{
+	runPrompt := promptui.Prompt{
 		Label:     label,
 		IsConfirm: true,
 	}
 
-	shouldRun, _ := prompt.Run()
+	shouldRun, _ := runPrompt.Run()
 	newOut := recommendedCommand
 
 	if strings.ToLower(shouldRun) == "y" {

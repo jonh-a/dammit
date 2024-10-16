@@ -62,6 +62,8 @@ func initConfig() {
 	}
 
 	viper.SetDefault("VERBOSITY", 1)
+	viper.SetDefault("RUN_RECOMMENDATION", true)
+	viper.SetDefault("TEMPERATURE", 0.1)
 	viper.SetDefault("MODEL", "llama3.2:1b")
 	viper.SetEnvPrefix("DAMMIT")
 

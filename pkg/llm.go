@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -12,15 +13,7 @@ import (
 )
 
 func GetPrompt() string {
-	prompt := `Given the following system information and command input + output, 
-dignose the problem and provide a solution. Do not repeat the system info.
-
-If there area any obvious typos in the command, provide a suggested command 
-at the end of your reply in plain text, prefaced with "Recommended command: ". The
-command should be on the same line as "Recommended command: " and there should be no
-text following it. Do not include any backticks surrounding the command and do not include
-any lines of text after it.
-`
+	prompt := DefaultPrompt()
 
 	verbosity := viper.Get("VERBOSITY")
 
@@ -36,13 +29,15 @@ any lines of text after it.
 
 func CallLLM(message string) string {
 	model := getModel()
+	temperature := getTemperature()
+
 	llm, err := ollama.New(ollama.WithModel(model))
 	if err != nil {
 		log.Fatal(err)
 	}
 	ctx := context.Background()
 	completion, err := llm.Call(ctx, message,
-		llms.WithTemperature(0.1),
+		llms.WithTemperature(temperature),
 		llms.WithStreamingFunc(func(ctx context.Context, chunk []byte) error {
 			fmt.Print(string(chunk))
 			return nil
@@ -50,13 +45,13 @@ func CallLLM(message string) string {
 	)
 
 	if err != nil {
-		fmt.Println(checkError(err))
+		fmt.Println(checkOllamaError(err))
 	}
 
 	return completion
 }
 
-func checkError(err error) string {
+func checkOllamaError(err error) string {
 	e := fmt.Sprintf("An error occurred while calling the LLM: %s", err)
 	if strings.Contains(e, "connect: connection refused") {
 		return fmt.Sprintf("%s\nIt looks like Ollama may not be running.", e)
@@ -71,7 +66,27 @@ func getModel() string {
 	if str, ok := viper.Get("MODEL").(string); ok {
 		return str
 	} else {
-		log.Fatalf("Invalid model selected.")
+		fmt.Println("Invalid model selected. Defaulting to llama3.2:1b.")
 		return ""
 	}
+}
+
+func getTemperature() float64 {
+	tempStr := viper.GetString("TEMPERATURE")
+	if tempStr == "" {
+		return 0.1
+	}
+
+	temp, err := strconv.ParseFloat(tempStr, 64)
+	if err != nil {
+		fmt.Println("Invalid temperature selected (must be a float between 0.1 and 1.0; default 0.1). Defaulting to 0.1.")
+		return 0.1
+	}
+
+	if temp < 0.1 || temp > 1.0 {
+		fmt.Println("Temperature out of range (must be between 0.1 and 1.0). Defaulting to 0.1.")
+		return 0.1
+	}
+
+	return temp
 }
