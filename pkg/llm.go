@@ -27,10 +27,7 @@ func GetPrompt() string {
 	return prompt
 }
 
-func CallLLM(message string) string {
-	model := getModel()
-	temperature := getTemperature()
-
+func CallLLM(message string, model string, temperature float64) string {
 	llm, err := ollama.New(ollama.WithModel(model))
 	if err != nil {
 		log.Fatal(err)
@@ -67,7 +64,7 @@ func getModel() string {
 		return str
 	} else {
 		fmt.Println("Invalid model selected. Defaulting to llama3.2:1b.")
-		return ""
+		return "llama3.2:1b"
 	}
 }
 

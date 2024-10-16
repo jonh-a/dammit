@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -17,6 +18,8 @@ func Init() {
 	}
 
 	appendAliasToRc(shell, rc)
+	checkIfOllamaIsInstalled()
+	printSuccessInstructions(rc)
 }
 
 func normalizeShellName(shell string) string {
@@ -65,9 +68,26 @@ func appendAliasToRc(shell string, rc string) {
 		if err != nil {
 			log.Fatalf("Error occurred when writing to %s: %s", rc, err)
 		}
-
-		printSuccessInstructions(rc)
 	}
+}
+
+func checkIfOllamaIsInstalled() bool {
+	shell := GetShell()
+
+	out, err := exec.Command(shell, "-c", "ollamaasdf").CombinedOutput()
+
+	if err != nil {
+		if strings.Contains(fmt.Sprint(err), "127") {
+			fmt.Println(`Warning: Ollama is not found in the system PATH. Ollama is required for Dammit.`)
+			return false
+		} else {
+			fmt.Println("Warning: An unexpected error occurred while calling `ollama`.")
+			return false
+		}
+	}
+
+	fmt.Println(shell, string(out))
+	return true
 }
 
 func printSuccessInstructions(rc string) {

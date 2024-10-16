@@ -22,6 +22,7 @@ The following variables can be set:
 
 - MODEL (env. `DAMMIT_MODEL`): The name of the Ollama model to use (default `llama3.2:1b`)
 - VERBOSITY (env. `DAMMIT_VERBOSITY`): An integer between 0-2 representing the response verbosity (default `1`).
+- TEMPERATURE (env. `DAMMIT_TEMPERATURE`): A float between 0.1-1.0 representing the response temperature (default `0.1`).
 
 ## Local development
 

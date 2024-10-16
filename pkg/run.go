@@ -9,6 +9,10 @@ import (
 )
 
 func Run(command string) {
+	// Fetch values from Viper
+	model := getModel()
+	temp := getTemperature()
+
 	// Prompt user to re-run the last command.
 	// If "no" is selected, then we can't capture stdout/stderr
 	// and the completion will have to be generated only by the command.
@@ -24,7 +28,7 @@ func Run(command string) {
 
 	shouldRerun, _ := rerunPrompt.Run()
 
-	out := dataString + "\nCommand: " + command
+	out := "\nCommand: " + command
 
 	if strings.ToLower(shouldRerun) == "y" {
 		out += "\n" + runCommand(command)
@@ -34,7 +38,7 @@ func Run(command string) {
 	// Get advice from the LLM. The LLM /should/ provide a recommended
 	// alternative command, if one is available. We can parse this from
 	// the response.
-	completion := CallLLM(GetPrompt() + out)
+	completion := CallLLM(GetPrompt()+dataString+out, model, temp)
 	recommendedCommand := getRecommendedCommand(completion)
 
 	if recommendedCommand == "" {
@@ -62,13 +66,9 @@ func runCommand(command string) string {
 	shell := GetShell()
 
 	cmd := exec.Command(shell, "-c", command)
-	output, err := cmd.Output()
+	output, _ := cmd.CombinedOutput()
 
-	if err != nil {
-		return fmt.Sprintf("Error: %s\nOutput: %s", err.Error(), string(output))
-	}
-
-	return string(output)
+	return fmt.Sprintf("Output: %s", string(output))
 }
 
 func getRecommendedCommand(response string) string {
